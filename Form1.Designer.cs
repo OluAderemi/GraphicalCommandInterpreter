@@ -60,6 +60,7 @@
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(623, 31);
             textBox1.TabIndex = 2;
+            textBox1.KeyDown += textBox1_KeyDown;
             // 
             // button1
             // 
@@ -87,6 +88,7 @@
             button3.TabIndex = 5;
             button3.Text = "Run";
             button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
             // 
             // button4
             // 

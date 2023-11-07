@@ -40,7 +40,7 @@
             // 
             // richTextBox1
             // 
-            richTextBox1.Location = new Point(1385, 124);
+            richTextBox1.Location = new Point(338, 124);
             richTextBox1.Name = "richTextBox1";
             richTextBox1.Size = new Size(623, 576);
             richTextBox1.TabIndex = 0;
@@ -48,11 +48,13 @@
             // 
             // pictureBox1
             // 
-            pictureBox1.Location = new Point(338, 124);
+            pictureBox1.BackColor = SystemColors.ActiveBorder;
+            pictureBox1.Location = new Point(1425, 124);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(623, 576);
             pictureBox1.TabIndex = 1;
             pictureBox1.TabStop = false;
+            pictureBox1.Click += pictureBox1_Click;
             // 
             // textBox1
             // 

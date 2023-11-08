@@ -6,9 +6,10 @@ namespace GraphicalCommandInterpreter
 {
     public partial class Form1 : Form
     {
-        private int penX = 200; // Default X position of the 'pen'
-        private int penY = 200; // Default Y position of the 'pen'
+        private int penX = 0; // Default X position of the 'pen'
+        private int penY = 0; // Default Y position of the 'pen'
         private const int markerSize = 10; // Marker size
+        private bool isMove = false; // Flag to determine if the user has moved the marker
 
         public Form1()
         {
@@ -42,10 +43,27 @@ namespace GraphicalCommandInterpreter
                         {
                             penX = x; // Update pen's X position
                             penY = y; // Update pen's Y position
-                            DrawPenMarker(); // Draw the pen marker after moving
+                            MovePenMarker(); // Draw the pen marker after moving
 
                         }
                     }
+                    break;
+
+                case "drawto":
+                    if (parts.Length >= 3)
+                    {
+                        int x, y;
+                        if (int.TryParse(parts[1], out x) && int.TryParse(parts[2], out y))
+                        {
+                            penX = x; // Store X coordinate for drawing
+                            penY = y; // Store Y coordinate for drawing
+                            MoveToButDrawWithNoPenMarker();
+                        }
+                    }
+                    break;
+
+                case "clear":
+                    pictureBox1.Invalidate();
                     break;
 
                 case "circle":
@@ -54,10 +72,35 @@ namespace GraphicalCommandInterpreter
                         int radius;
                         if (int.TryParse(parts[1], out radius))
                         {
-                            DrawCircle(radius);
+                            DrawCircle(radius);    
                         }
                     }
                     break;
+
+                case "rectangle":
+                    if (parts.Length >= 3)
+                    {
+                        int width, height;
+                        if (int.TryParse(parts[1], out width) && int.TryParse(parts[2], out height))
+                        {
+                            DrawRectangle(width, height);
+                        }
+                    }
+                    break;
+
+                case "triangle":
+                    if (parts.Length >= 7) // Three points (x, y) required to draw a triangle
+                    {
+                        int x1, y1, x2, y2, x3, y3;
+                        if (int.TryParse(parts[1], out x1) && int.TryParse(parts[2], out y1) &&
+                            int.TryParse(parts[3], out x2) && int.TryParse(parts[4], out y2) &&
+                            int.TryParse(parts[5], out x3) && int.TryParse(parts[6], out y3))
+                        {
+                            DrawTriangle(x1, y1, x2, y2, x3, y3);
+                        }
+                    }
+                    break;
+
 
                 // Add cases for other commands as needed
 
@@ -67,7 +110,7 @@ namespace GraphicalCommandInterpreter
             }
         }
 
-        private void DrawPenMarker()
+        private void MovePenMarker() // Used for moveto command, the marker will be shown
         {
             // Clear the PictureBox before drawing the marker
                 pictureBox1.Refresh();
@@ -78,10 +121,35 @@ namespace GraphicalCommandInterpreter
                     Brush markerBrush = Brushes.Blue;
 
                     g.FillEllipse(markerBrush, penX, penY, markerSize, markerSize);
-                }
+                isMove = true;
+            }
             
         }
 
+        private void MoveToButDrawWithNoPenMarker() // Used for drawto command, the marker will not be shown
+        {
+            // Clear the PictureBox before drawing the marker
+            //pictureBox1.Refresh();
+
+            using (Graphics g = pictureBox1.CreateGraphics())
+            {
+                // Change the pen marker color to a contrasting one like blue
+                Brush markerBrush = Brushes.Transparent;
+
+                g.FillEllipse(markerBrush, penX, penY, markerSize, markerSize);
+                //isMove = true;
+            }
+
+        }
+
+        private void ClearDrawingArea()
+        {
+            using (Graphics g = pictureBox1.CreateGraphics())
+            {
+                // Clear the PictureBox with the form's background color
+                g.Clear(this.BackColor);
+            }
+        }
 
 
         private void DrawCircle(int radius)
@@ -93,7 +161,24 @@ namespace GraphicalCommandInterpreter
             }
         }
 
-        // Other drawing methods (DrawRectangle, DrawTriangle) go here...
+        private void DrawRectangle(int width, int height)
+        {
+            using (Graphics g = pictureBox1.CreateGraphics())
+            {
+                g.DrawRectangle(Pens.Black, penX, penY, width, height);
+            }
+        }
+
+        private void DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3)
+        {
+            Point[] points = { new Point(x1, y1), new Point(x2, y2), new Point(x3, y3) };
+
+            using (Graphics g = pictureBox1.CreateGraphics())
+            {
+                g.DrawPolygon(Pens.Black, points);
+            }
+        }
+
 
         private void ExecuteSingleCommand(string command)
         {
@@ -129,15 +214,18 @@ namespace GraphicalCommandInterpreter
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-
-            pictureBox1.Refresh();
-            using (Graphics g = pictureBox1.CreateGraphics())
+            if (isMove == false)
             {
-                // Change the pen marker color to a contrasting one like blue
-                Brush markerBrush = Brushes.Blue;
+                pictureBox1.Refresh();
+                using (Graphics g = pictureBox1.CreateGraphics())
+                {
+                    // Change the pen marker color to a contrasting one like blue
+                    Brush markerBrush = Brushes.Blue;
 
-                g.FillEllipse(markerBrush, 0, 0, 10, 10);
+                    g.FillEllipse(markerBrush, 0, 0, 10, 10);
+                }
             }
+            
             
         }
     }

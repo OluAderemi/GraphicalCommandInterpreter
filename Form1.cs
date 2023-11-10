@@ -6,22 +6,23 @@ namespace GraphicalCommandInterpreter
 {
     public partial class Form1 : Form
     {
-        private int penX = 0; // Default X position of the 'pen'
-        private int penY = 0; // Default Y position of the 'pen'
-        private int markerSize = 10; // Marker size
-        
+        public int penX = 0; // Default X position of the 'pen'
+        public int penY = 0; // Default Y position of the 'pen'
+        public int markerSize = 10; // Marker size
+
+        private CommandParser commandParser; // Instance of the CommandParser
 
         public Form1()
         {
             InitializeComponent();
             this.Load += Form_Load!;
             MarkerShow();
-            //pictureBox1.Paint += PictureBox1_Paint!; // Subscribe to the PictureBox's Paint event
+            pictureBox1.Paint += PictureBox1_Paint!;
+            commandParser = new CommandParser(); // Instantiate the CommandParser
         }
 
         private void Form_Load(object sender, EventArgs e)
         {
-            // Subscribe to the PictureBox's Paint event
             pictureBox1.Paint += PictureBox1_Paint!;
         }
 
@@ -40,128 +41,26 @@ namespace GraphicalCommandInterpreter
             }
         }
 
-        private void HandleCommand(string command)
+        public void MovePenMarker()
         {
-            string[] parts = command.Split(' ');
-
-            if (parts.Length < 1)
-            {
-                // Command not recognized or incomplete
-                return;
-            }
-            string commandType = parts[0].ToLower();
-            switch (commandType)
-            {
-                case "moveto":
-                    if (parts.Length >= 3)
-                    {
-                        int x, y;
-                        if (int.TryParse(parts[1], out x) && int.TryParse(parts[2], out y))
-                        {
-                            penX = x; // Update pen's X position
-                            penY = y; // Update pen's Y position
-                            MovePenMarker(); // Draw the pen marker after moving
-
-                        }
-                    }
-                    break;
-
-                case "drawto":
-                    if (parts.Length >= 3)
-                    {
-                        int x, y;
-                        if (int.TryParse(parts[1], out x) && int.TryParse(parts[2], out y))
-                        {
-                            penX = x; // Store X coordinate for drawing
-                            penY = y; // Store Y coordinate for drawing
-                            MoveToButDrawWithNoPenMarker();
-                        }
-                    }
-                    break;
-
-                case "clear":
-
-                    ClearDrawingArea();
-                    break;
-
-                case "reset":
-                    penX = 0;
-                    penY = 0;
-                    MarkerShow();
-                    break;
-
-                case "circle":
-                    if (parts.Length >= 2)
-                    {
-                        int radius;
-                        if (int.TryParse(parts[1], out radius))
-                        {
-                            DrawCircle(radius);    
-                        }
-                    }
-                    break;
-
-                case "rectangle":
-                    if (parts.Length >= 3)
-                    {
-                        int width, height;
-                        if (int.TryParse(parts[1], out width) && int.TryParse(parts[2], out height))
-                        {
-                            DrawRectangle(width, height);
-                        }
-                    }
-                    break;
-
-                case "triangle":
-                    if (parts.Length >= 4)
-                    {
-                        int adj, @base, hyp; // using '@base' as 'base' is a keyword
-                        if (int.TryParse(parts[1], out adj) && int.TryParse(parts[2], out @base) && int.TryParse(parts[3], out hyp))
-                        {
-                            DrawTriangle(adj, @base, hyp);
-                        }
-                    }
-                    break;
-
-
-                // Add cases for other commands as needed
-
-                default:
-                    // Command not recognized
-                    break;
-            }
-        }
-
-        private void MovePenMarker() // Used for moveto command, the marker will be shown
-        {
-            // Clear the PictureBox before drawing the marker
             pictureBox1.Refresh();
-                using (Graphics g = pictureBox1.CreateGraphics())
-                {
-                // Change the pen marker color to a contrasting one like blue
-                Brush markerBrush = Brushes.Blue;
-
-                    g.FillEllipse(markerBrush, penX, penY, 10, 10);
-            }
-
-        }
-
-        private void MoveToButDrawWithNoPenMarker() // Used for drawto command, the marker will not be shown
-        {
-            // Clear the PictureBox before drawing the marker
-            //pictureBox1.Refresh();
-
             using (Graphics g = pictureBox1.CreateGraphics())
             {
-                // Change the pen marker color to a contrasting one like blue
-                Brush markerBrush = Brushes.Transparent;
-
-                g.FillEllipse(markerBrush, penX, penY, markerSize, markerSize);
+                Brush markerBrush = Brushes.Blue;
+                g.FillEllipse(markerBrush, penX, penY, 10, 10);
             }
-
         }
 
-        private void ClearDrawingArea()
+        public void MoveToButDrawWithNoPenMarker()
+        {
+            using (Graphics g = pictureBox1.CreateGraphics())
+            {
+                Brush markerBrush = Brushes.Transparent;
+                g.FillEllipse(markerBrush, penX, penY, markerSize, markerSize);
+            }
+        }
+
+        public void ClearDrawingArea()
         {
             pictureBox1.Invalidate();
             penX = 0;
@@ -169,8 +68,7 @@ namespace GraphicalCommandInterpreter
             markerSize = 0;
         }
 
-
-        private void DrawCircle(int radius)
+        public void DrawCircle(int radius)
         {
             int diameter = radius * 2;
             using (Graphics g = pictureBox1.CreateGraphics())
@@ -179,36 +77,30 @@ namespace GraphicalCommandInterpreter
             }
         }
 
-        private void DrawRectangle(int width, int height)
+        public void DrawRectangle(int width, int height)
         {
-            // Calculate the starting X and Y coordinates to draw the rectangle from its center
             int startX = penX - width / 2;
             int startY = penY - height / 2;
 
-            // Draw the rectangle using the calculated coordinates
             using (Graphics g = pictureBox1.CreateGraphics())
             {
                 g.DrawRectangle(Pens.Black, startX, startY, width, height);
             }
         }
 
-
-        private void DrawTriangle(int adj, int @base, int hyp)
+        public void DrawTriangle(int adj, int @base, int hyp)
         {
-            // Calculate the coordinates for the vertices of the triangle
             int x1 = penX;
             int y1 = penY;
 
             int x2 = penX + adj;
             int y2 = penY;
 
-            // Calculate the height based on the hypotenuse and base
             int height = (int)Math.Sqrt(hyp * hyp - (@base / 2) * (@base / 2));
 
             int x3 = penX + @base;
             int y3 = penY - height;
 
-            // Draw the triangle using the calculated coordinates
             using (Graphics g = pictureBox1.CreateGraphics())
             {
                 g.DrawLine(Pens.Black, x1, y1, x2, y2);
@@ -217,36 +109,25 @@ namespace GraphicalCommandInterpreter
             }
         }
 
-
-        private void MarkerShow()
+        public void MarkerShow()
         {
-
-                pictureBox1.Refresh();
-                using (Graphics g = pictureBox1.CreateGraphics())
-                {
-                    // Change the pen marker color to a contrasting one like blue
-                    Brush markerBrush = Brushes.Blue;
-
-                    g.FillEllipse(markerBrush, 0, 0, 10, 10);
-                }
-            
-
-
+            pictureBox1.Refresh();
+            using (Graphics g = pictureBox1.CreateGraphics())
+            {
+                Brush markerBrush = Brushes.Blue;
+                g.FillEllipse(markerBrush, 0, 0, 10, 10);
+            }
         }
 
         private void ExecuteSingleCommand(string command)
         {
-            HandleCommand(command);
+            commandParser.HandleCommand(this, command); // Pass the Form1 instance to the command parser
             // Update PictureBox1 here if required after handling the command
         }
 
         private void ExecuteMultiLineCommands(string commands)
         {
-            string[] commandLines = commands.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (string line in commandLines)
-            {
-                ExecuteSingleCommand(line);
-            }
+            commandParser.HandleCommand(this, commands); // Pass the Form1 instance to the command parser
             // Update PictureBox1 here if required after handling multi-line commands
         }
 
@@ -268,19 +149,8 @@ namespace GraphicalCommandInterpreter
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            /*if (isMove == false)
-            {
-                pictureBox1.Refresh();
-                using (Graphics g = pictureBox1.CreateGraphics())
-                {
-                    // Change the pen marker color to a contrasting one like blue
-                    Brush markerBrush = Brushes.Blue;
-
-                    g.FillEllipse(markerBrush, 0, 0, 10, 10);
-                }
-            }
-            */
-            
+            // Handle PictureBox click event if needed
+            // ...
         }
     }
 }

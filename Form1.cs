@@ -9,6 +9,8 @@ namespace GraphicalCommandInterpreter
         public int penX = 0; // Default X position of the 'pen'
         public int penY = 0; // Default Y position of the 'pen'
         public int markerSize = 10; // Marker size
+        private Color penColor = Color.Black;
+        private bool fillEnabled = false;
 
         private CommandParser commandParser; // Instance of the CommandParser
 
@@ -40,7 +42,15 @@ namespace GraphicalCommandInterpreter
                 e.Graphics.FillEllipse(brush, x, y, brushSize, brushSize);
             }
         }
+        public void SetPenColor(Color color)
+        {
+            penColor = color;
+        }
 
+        public void SetFillStatus(bool status)
+        {
+            fillEnabled = status;
+        }
         public void MovePenMarker()
         {
             pictureBox1.Refresh();
@@ -66,6 +76,8 @@ namespace GraphicalCommandInterpreter
             penX = 0;
             penY = 0;
             markerSize = 0;
+            fillEnabled = false;
+            penColor = Color.Black;
         }
 
         public void DrawCircle(int radius)
@@ -73,7 +85,13 @@ namespace GraphicalCommandInterpreter
             int diameter = radius * 2;
             using (Graphics g = pictureBox1.CreateGraphics())
             {
-                g.DrawEllipse(Pens.Black, penX - radius, penY - radius, diameter, diameter);
+                Pen pen = new Pen(penColor);
+                if (fillEnabled)
+                {
+                    Brush fillBrush = new SolidBrush(penColor);
+                    g.FillEllipse(fillBrush, penX - radius, penY - radius, diameter, diameter);
+                }
+                g.DrawEllipse(pen, penX - radius, penY - radius, diameter, diameter);
             }
         }
 
@@ -84,7 +102,13 @@ namespace GraphicalCommandInterpreter
 
             using (Graphics g = pictureBox1.CreateGraphics())
             {
-                g.DrawRectangle(Pens.Black, startX, startY, width, height);
+                Pen pen = new Pen(penColor);
+                if (fillEnabled)
+                {
+                    Brush fillBrush = new SolidBrush(penColor);
+                    g.FillRectangle(fillBrush, startX, startY, width, height);
+                }
+                g.DrawRectangle(pen, startX, startY, width, height);
             }
         }
 
@@ -103,20 +127,32 @@ namespace GraphicalCommandInterpreter
 
             using (Graphics g = pictureBox1.CreateGraphics())
             {
-                g.DrawLine(Pens.Black, x1, y1, x2, y2);
-                g.DrawLine(Pens.Black, x2, y2, x3, y3);
-                g.DrawLine(Pens.Black, x3, y3, x1, y1);
+                Pen pen = new Pen(penColor);
+                if (fillEnabled)
+                {
+                    Brush fillBrush = new SolidBrush(penColor);
+                    Point[] points = { new Point(x1, y1), new Point(x2, y2), new Point(x3, y3) };
+                    g.FillPolygon(fillBrush, points);
+                }
+                g.DrawLine(pen, x1, y1, x2, y2);
+                g.DrawLine(pen, x2, y2, x3, y3);
+                g.DrawLine(pen, x3, y3, x1, y1);
             }
         }
 
+
         public void MarkerShow()
         {
+            penX = 0;
+            penY = 0;
+            fillEnabled = false;
+            penColor = Color.Black;
             pictureBox1.Refresh();
-            using (Graphics g = pictureBox1.CreateGraphics())
+            /*using (Graphics g = pictureBox1.CreateGraphics())
             {
                 Brush markerBrush = Brushes.Blue;
                 g.FillEllipse(markerBrush, 0, 0, 10, 10);
-            }
+            }*/
         }
 
         private void ExecuteSingleCommand(string command)
@@ -151,6 +187,61 @@ namespace GraphicalCommandInterpreter
         {
             // Handle PictureBox click event if needed
             // ...
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            // Show a SaveFileDialog to allow the user to choose where to save the file
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+                saveFileDialog.Title = "Save Text File";
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    // Get the selected file name
+                    string fileName = saveFileDialog.FileName;
+
+                    try
+                    {
+                        // Save the content of richTextBox1 to the selected file
+                        System.IO.File.WriteAllText(fileName, richTextBox1.Text);
+                        MessageBox.Show("File saved successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error saving file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+            richTextBox1.Clear();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // Show an OpenFileDialog to allow the user to choose a file to open
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+                openFileDialog.Title = "Open Text File";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    // Get the selected file name
+                    string fileName = openFileDialog.FileName;
+
+                    try
+                    {
+                        // Load the content of the selected file into richTextBox1
+                        richTextBox1.Text = System.IO.File.ReadAllText(fileName);
+                        MessageBox.Show("File loaded successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error loading file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
         }
     }
 }

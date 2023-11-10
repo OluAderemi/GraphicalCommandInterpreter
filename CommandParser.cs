@@ -10,7 +10,8 @@ namespace GraphicalCommandInterpreter
 
             foreach (string line in commandLines)
             {
-                string[] parts = line.Split(' ');
+                // Split the line using both spaces and commas
+                string[] parts = line.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
 
                 if (parts.Length < 1)
                 {
@@ -27,9 +28,9 @@ namespace GraphicalCommandInterpreter
                             int x, y;
                             if (int.TryParse(parts[1], out x) && int.TryParse(parts[2], out y))
                             {
-                                form.penX = x; // Update pen's X position
-                                form.penY = y; // Update pen's Y position
-                                form.MovePenMarker(); // Draw the pen marker after moving
+                                form.penX = x;
+                                form.penY = y;
+                                form.MovePenMarker();
                             }
                         }
                         break;
@@ -40,9 +41,52 @@ namespace GraphicalCommandInterpreter
                             int x, y;
                             if (int.TryParse(parts[1], out x) && int.TryParse(parts[2], out y))
                             {
-                                form.penX = x; // Store X coordinate for drawing
-                                form.penY = y; // Store Y coordinate for drawing
+                                form.penX = x;
+                                form.penY = y;
                                 form.MoveToButDrawWithNoPenMarker();
+                            }
+                        }
+                        break;
+
+                    case "pen":
+                        if (parts.Length >= 2)
+                        {
+                            string color = parts[1].ToLower();
+                            switch (color)
+                            {
+                                case "red":
+                                    form.SetPenColor(Color.Red);
+                                    break;
+                                case "green":
+                                    form.SetPenColor(Color.Green);
+                                    break;
+                                case "black":
+                                    form.SetPenColor(Color.Black);
+                                    break;
+                                // Add more color options as needed
+                                default:
+                                    // Invalid color
+                                    break;
+                            }
+                        }
+                        break;
+
+                    case "fill":
+                        if (parts.Length >= 2)
+                        {
+                            string fillStatus = parts[1].ToLower();
+                            switch (fillStatus)
+                            {
+                                case "on":
+                                    form.SetFillStatus(true);
+                                    break;
+                                case "off":
+                                    form.SetFillStatus(false);
+                                    break;
+                                // Add more options as needed
+                                default:
+                                    // Invalid fill status
+                                    break;
                             }
                         }
                         break;
@@ -52,8 +96,8 @@ namespace GraphicalCommandInterpreter
                         break;
 
                     case "reset":
-                        form.penX = 0;
-                        form.penY = 0;
+                        //form.penX = 0;
+                        //form.penY = 0;
                         form.MarkerShow();
                         break;
 

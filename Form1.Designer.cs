@@ -72,6 +72,7 @@
             button1.TabIndex = 3;
             button1.Text = "Open";
             button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // button2
             // 
@@ -81,6 +82,7 @@
             button2.TabIndex = 4;
             button2.Text = "Save";
             button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click;
             // 
             // button3
             // 

@@ -86,11 +86,7 @@ namespace GraphicalCommandInterpreter
         public void ClearDrawingArea()
         {
             pictureBox1.Invalidate();
-            penX = 0;
-            penY = 0;
             markerSize = 0;
-            fillEnabled = false;
-            penColor = Color.Black;
         }
 
         public void DrawCircle(int radius)
@@ -158,9 +154,16 @@ namespace GraphicalCommandInterpreter
         {
             penX = 0;
             penY = 0;
+            pictureBox1.Refresh();
+            using (Graphics g = pictureBox1.CreateGraphics())
+            {
+                Brush markerBrush = Brushes.Blue;
+                g.FillEllipse(markerBrush, 0, 0, 10, 10);
+            }
             fillEnabled = false;
             penColor = Color.Black;
-            pictureBox1.Refresh();
+            
+            
         }
 
         /// <summary>
@@ -207,7 +210,7 @@ namespace GraphicalCommandInterpreter
         /// <summary>
         /// Saves the content of the richTextBox1 to a selected text file.
         /// </summary>
-        public void button2_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
             // Show a SaveFileDialog to allow the user to choose where to save the file
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
@@ -237,9 +240,8 @@ namespace GraphicalCommandInterpreter
         /// <summary>
         /// Loads the content of a selected text file into richTextBox1.
         /// </summary>
-        public void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
-            richTextBox1 = new RichTextBox();
             // Show an OpenFileDialog to allow the user to choose a file to open
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -265,7 +267,7 @@ namespace GraphicalCommandInterpreter
             }
         }
 
-        public RichTextBox GetRichTextBox()
+        /*public RichTextBox GetRichTextBox()
         {
             return richTextBox1;
         }
@@ -286,7 +288,7 @@ namespace GraphicalCommandInterpreter
             {
                 richTextBox1.Text = File.ReadAllText(fileName);
             }
-        }
+        }*/
 
         public void richTextBox1_TextChanged(object sender, EventArgs e)
         {

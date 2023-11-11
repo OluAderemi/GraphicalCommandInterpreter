@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 
 namespace GraphicalCommandInterpreter
 {
@@ -219,11 +220,11 @@ namespace GraphicalCommandInterpreter
                 MessageBox.Show($"Error in command '{ex.InvalidCommand}': {ex.Message}", "Invalid Command.", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 throw ex;
             }
-            catch (Exception ex)
+            /*catch (Exception ex)
             {
                 // Handle other exceptions if needed
                 MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            }*/
         }
-        }
+    }
 }

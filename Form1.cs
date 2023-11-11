@@ -91,7 +91,9 @@ namespace GraphicalCommandInterpreter
             pictureBox1.Invalidate();
             markerSize = 0;
         }
-
+        /// <summary>
+        /// Draws a circle that takes a radius parameter.
+        /// </summary>
         public void DrawCircle(int radius)
         {
             int diameter = radius * 2;
@@ -108,7 +110,7 @@ namespace GraphicalCommandInterpreter
         }
 
         /// <summary>
-        /// Draws a rectangle takes two parameters, width and height.
+        /// Draws a rectangle that takes two parameters, width and height.
         /// </summary>
         public void DrawRectangle(int width, int height)
         {

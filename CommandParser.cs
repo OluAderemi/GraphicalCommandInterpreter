@@ -9,7 +9,11 @@ namespace GraphicalCommandInterpreter
         // Invalid command that caused the exception
         public string InvalidCommand { get; }
 
-        // Constructor that takes the invalid command and a message
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InvalidCommandException"/> class with the specified invalid command and message.
+        /// </summary>
+        /// <param name="invalidCommand">The invalid command that caused the exception.</param>
+        /// <param name="message">The error message that explains the reason for the exception.</param>
         public InvalidCommandException(string invalidCommand, string message) : base(message)
         {
             InvalidCommand = invalidCommand;
@@ -21,6 +25,12 @@ namespace GraphicalCommandInterpreter
     /// </summary>
     public class CommandParser
     {
+        /// <summary>
+        /// Handles the specified graphical command and performs the corresponding action on the given form.
+        /// </summary>
+        /// <param name="form">The form on which the graphical commands will be executed.</param>
+        /// <param name="command">The graphical command to handle.</param>
+        /// <exception cref="InvalidCommandException">Thrown when the command is invalid or contains errors.</exception>
         public void HandleCommand(Form1 form, string command)
         {
             try
@@ -199,7 +209,7 @@ namespace GraphicalCommandInterpreter
                             break;
 
                         default:
-                            throw new InvalidCommandException(line, "Valid Commands include: moveto, drawto, pen, fill, clear, reset, circle, rectangle and triangle. Try one");
+                            throw new InvalidCommandException(line, "Valid Commands include: moveto, drawto, pen, fill, clear, reset, circle, rectangle, and triangle. Try one");
                     }
                 }
             }
@@ -207,6 +217,7 @@ namespace GraphicalCommandInterpreter
             {
                 // Handle the exception here, e.g., display a message to the user
                 MessageBox.Show($"Error in command '{ex.InvalidCommand}': {ex.Message}", "Invalid Command.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw ex;
             }
             catch (Exception ex)
             {

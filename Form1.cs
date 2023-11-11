@@ -129,6 +129,9 @@ namespace GraphicalCommandInterpreter
             }
         }
 
+        /// <summary>
+        /// Draws a tiangle that takes three parameters, adjacent, base and hypotenuse.
+        /// </summary>
         public void DrawTriangle(int adj, int @base, int hyp)
         {
             int x1 = penX;

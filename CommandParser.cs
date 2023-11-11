@@ -149,7 +149,7 @@ namespace GraphicalCommandInterpreter
                             break;
 
                         case "reset":
-                            form.MarkerShow();
+                            form.Reset();
                             break;
 
                         case "circle":

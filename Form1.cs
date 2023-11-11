@@ -23,7 +23,7 @@ namespace GraphicalCommandInterpreter
         {
             InitializeComponent();
             this.Load += Form_Load!;
-            MarkerShow();
+            Reset();
             pictureBox1.Paint += PictureBox1_Paint!;
             commandParser = new CommandParser(); // Instantiate the CommandParser
             
@@ -83,6 +83,9 @@ namespace GraphicalCommandInterpreter
             }
         }
 
+        /// <summary>
+        /// Clears the drawing area
+        /// </summary>
         public void ClearDrawingArea()
         {
             pictureBox1.Invalidate();
@@ -149,8 +152,10 @@ namespace GraphicalCommandInterpreter
             }
         }
 
-
-        public void MarkerShow()
+        /// <summary>
+        /// Clears the drawing area and returns the Pen to 0,0
+        /// </summary>
+        public void Reset()
         {
             penX = 0;
             penY = 0;

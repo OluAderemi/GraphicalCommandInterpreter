@@ -16,6 +16,7 @@ namespace GraphicalCommandInterpreter
         public Color penColor = Color.Black;
         public bool fillEnabled = false;
 
+
         private CommandParser commandParser; // Instance of the CommandParser
 
         public Form1()
@@ -25,6 +26,7 @@ namespace GraphicalCommandInterpreter
             MarkerShow();
             pictureBox1.Paint += PictureBox1_Paint!;
             commandParser = new CommandParser(); // Instantiate the CommandParser
+            
         }
 
         private void Form_Load(object sender, EventArgs e)
@@ -195,8 +197,10 @@ namespace GraphicalCommandInterpreter
             // Handle PictureBox click event if needed
             // ...
         }
-
-        private void button2_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Saves the content of the richTextBox1 to a selected text file.
+        /// </summary>
+        public void button2_Click(object sender, EventArgs e)
         {
             // Show a SaveFileDialog to allow the user to choose where to save the file
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
@@ -223,9 +227,12 @@ namespace GraphicalCommandInterpreter
             }
             richTextBox1.Clear();
         }
-
-        private void button1_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Loads the content of a selected text file into richTextBox1.
+        /// </summary>
+        public void button1_Click(object sender, EventArgs e)
         {
+            richTextBox1 = new RichTextBox();
             // Show an OpenFileDialog to allow the user to choose a file to open
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -250,5 +257,34 @@ namespace GraphicalCommandInterpreter
                 }
             }
         }
+
+        public RichTextBox GetRichTextBox()
+        {
+            return richTextBox1;
+        }
+
+        // Add SaveFile method
+        public void SaveToFile(string fileName)
+        {
+            using (StreamWriter sw = new StreamWriter(fileName))
+            {
+                sw.Write(richTextBox1.Text);
+            }
+        }
+
+        // Add LoadFile method
+        public void LoadFromFile(string fileName)
+        {
+            if (File.Exists(fileName))
+            {
+                richTextBox1.Text = File.ReadAllText(fileName);
+            }
+        }
+
+        public void richTextBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
     }
 }

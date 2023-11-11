@@ -95,6 +95,9 @@ namespace GraphicalCommandInterpreter
                             }
                             break;
 
+                        /// <summary>
+                        /// Changes the pen colour
+                        /// </summary>
                         case "pen":
                             if (parts.Length == 2)
                             {
@@ -121,7 +124,7 @@ namespace GraphicalCommandInterpreter
                             }
                             break;
                         /// <summary>
-                        /// Changes the pen colour
+                        /// Determines if shape drawn is outlined or filled by pen's clour
                         /// </summary>
                         case "fill":
                             if (parts.Length == 2)

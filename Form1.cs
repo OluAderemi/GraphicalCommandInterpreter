@@ -108,7 +108,7 @@ namespace GraphicalCommandInterpreter
         }
 
         /// <summary>
-        /// Draws a rectangle takes two parameters, width and height
+        /// Draws a rectangle takes two parameters, width and height.
         /// </summary>
         public void DrawRectangle(int width, int height)
         {

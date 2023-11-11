@@ -120,7 +120,9 @@ namespace GraphicalCommandInterpreter
                                 throw new InvalidCommandException(line, "Invalid parameter for pen command. pen takes a colour, e.g. pen red");
                             }
                             break;
-
+                        /// <summary>
+                        /// Changes the pen colour
+                        /// </summary>
                         case "fill":
                             if (parts.Length == 2)
                             {

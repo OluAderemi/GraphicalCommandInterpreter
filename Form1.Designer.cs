@@ -126,11 +126,11 @@
         #endregion
 
         private RichTextBox richTextBox1;
-        private PictureBox pictureBox1;
         private TextBox textBox1;
         private Button button1;
         private Button button2;
         private Button button3;
         private Button button4;
+        public PictureBox pictureBox1;
     }
 }

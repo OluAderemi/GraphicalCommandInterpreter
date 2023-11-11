@@ -26,7 +26,7 @@ namespace GraphicalCommandInterpreter
             Reset();
             pictureBox1.Paint += PictureBox1_Paint!;
             commandParser = new CommandParser(); // Instantiate the CommandParser
-            
+
         }
 
         private void Form_Load(object sender, EventArgs e)
@@ -107,6 +107,9 @@ namespace GraphicalCommandInterpreter
             }
         }
 
+        /// <summary>
+        /// Draws a rectangle takes two parameters, width and height
+        /// </summary>
         public void DrawRectangle(int width, int height)
         {
             int startX = penX - width / 2;
@@ -167,8 +170,8 @@ namespace GraphicalCommandInterpreter
             }
             fillEnabled = false;
             penColor = Color.Black;
-            
-            
+
+
         }
 
         /// <summary>
@@ -271,29 +274,6 @@ namespace GraphicalCommandInterpreter
                 }
             }
         }
-
-        /*public RichTextBox GetRichTextBox()
-        {
-            return richTextBox1;
-        }
-
-        // Add SaveFile method
-        public void SaveToFile(string fileName)
-        {
-            using (StreamWriter sw = new StreamWriter(fileName))
-            {
-                sw.Write(richTextBox1.Text);
-            }
-        }
-
-        // Add LoadFile method
-        public void LoadFromFile(string fileName)
-        {
-            if (File.Exists(fileName))
-            {
-                richTextBox1.Text = File.ReadAllText(fileName);
-            }
-        }*/
 
         public void richTextBox1_TextChanged(object sender, EventArgs e)
         {

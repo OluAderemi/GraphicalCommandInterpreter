@@ -60,7 +60,7 @@ namespace GraphicalCommandInterpreter
                                 {
                                     form.penX = x;
                                     form.penY = y;
-                                    form.MovePenMarker();
+                                    form.MoveTo();
                                 }
                                 else
                                 {
@@ -81,7 +81,7 @@ namespace GraphicalCommandInterpreter
                                 {
                                     form.penX = x;
                                     form.penY = y;
-                                    form.MoveToButDrawWithNoPenMarker();
+                                    form.DrawTo();
                                 }
                                 else
                                 {

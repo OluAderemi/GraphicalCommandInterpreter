@@ -57,7 +57,7 @@ namespace GraphicalCommandInterpreter
         {
             fillEnabled = status;
         }
-        public void MovePenMarker()
+        public void MoveTo()
         {
             pictureBox1.Refresh();
             using (Graphics g = pictureBox1.CreateGraphics())
@@ -67,7 +67,7 @@ namespace GraphicalCommandInterpreter
             }
         }
 
-        public void MoveToButDrawWithNoPenMarker()
+        public void DrawTo()
         {
             using (Graphics g = pictureBox1.CreateGraphics())
             {

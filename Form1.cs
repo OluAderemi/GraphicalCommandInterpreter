@@ -57,6 +57,10 @@ namespace GraphicalCommandInterpreter
         {
             fillEnabled = status;
         }
+
+        /// <summary>
+        /// Moves to the specified coordinates on the drawing area.
+        /// </summary>
         public void MoveTo()
         {
             pictureBox1.Refresh();
@@ -67,6 +71,9 @@ namespace GraphicalCommandInterpreter
             }
         }
 
+        /// <summary>
+        /// Sets the coordinates for next location to draw shapes.
+        /// </summary>
         public void DrawTo()
         {
             using (Graphics g = pictureBox1.CreateGraphics())

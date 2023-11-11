@@ -4,13 +4,17 @@ using System.Windows.Forms;
 
 namespace GraphicalCommandInterpreter
 {
+
+    /// <summary>
+    /// Represents the main form of the graphical command interpreter.
+    /// </summary>
     public partial class Form1 : Form
     {
         public int penX = 0; // Default X position of the 'pen'
         public int penY = 0; // Default Y position of the 'pen'
         public int markerSize = 10; // Marker size
-        private Color penColor = Color.Black;
-        private bool fillEnabled = false;
+        public Color penColor = Color.Black;
+        public bool fillEnabled = false;
 
         private CommandParser commandParser; // Instance of the CommandParser
 
@@ -148,20 +152,23 @@ namespace GraphicalCommandInterpreter
             fillEnabled = false;
             penColor = Color.Black;
             pictureBox1.Refresh();
-            /*using (Graphics g = pictureBox1.CreateGraphics())
-            {
-                Brush markerBrush = Brushes.Blue;
-                g.FillEllipse(markerBrush, 0, 0, 10, 10);
-            }*/
         }
 
-        private void ExecuteSingleCommand(string command)
+        /// <summary>
+        /// Executes a single-line command.
+        /// </summary>
+        /// <param name="command">The command to execute.</param>
+        public void ExecuteSingleCommand(string command)
         {
             commandParser.HandleCommand(this, command); // Pass the Form1 instance to the command parser
             // Update PictureBox1 here if required after handling the command
         }
 
-        private void ExecuteMultiLineCommands(string commands)
+        /// <summary>
+        /// Executes a multi-line command.
+        /// </summary>
+        /// <param name="commands">The multi-line commands to execute.</param>
+        public void ExecuteMultiLineCommands(string commands)
         {
             commandParser.HandleCommand(this, commands); // Pass the Form1 instance to the command parser
             // Update PictureBox1 here if required after handling multi-line commands

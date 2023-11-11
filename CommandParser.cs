@@ -2,6 +2,9 @@
 
 namespace GraphicalCommandInterpreter
 {
+    /// <summary>
+    /// Parses and handles graphical commands for the drawing application.
+    /// </summary>
     public class CommandParser
     {
         public void HandleCommand(Form1 form, string command)

@@ -26,7 +26,6 @@ namespace GraphicalCommandInterpreter
             Reset();
             pictureBox1.Paint += PictureBox1_Paint!;
             commandParser = new CommandParser(); // Instantiate the CommandParser
-
         }
 
         private void Form_Load(object sender, EventArgs e)
@@ -58,6 +57,26 @@ namespace GraphicalCommandInterpreter
             fillEnabled = status;
         }
 
+        
+
+        /// <summary>
+        /// Clears the drawing area and returns the Pen to 0,0
+        /// </summary>
+        public void Reset()
+        {
+            penX = 0;
+            penY = 0;
+            pictureBox1.Refresh();
+            using (Graphics g = pictureBox1.CreateGraphics())
+            {
+                Brush markerBrush = Brushes.Blue;
+                g.FillEllipse(markerBrush, 0, 0, 10, 10);
+            }
+            fillEnabled = false;
+            penColor = Color.Black;
+        }
+
+
         /// <summary>
         /// Moves to the specified coordinates on the drawing area.
         /// </summary>
@@ -69,6 +88,8 @@ namespace GraphicalCommandInterpreter
                 Brush markerBrush = Brushes.Blue;
                 g.FillEllipse(markerBrush, penX, penY, 10, 10);
             }
+           
+
         }
 
         /// <summary>
@@ -161,25 +182,6 @@ namespace GraphicalCommandInterpreter
         }
 
         /// <summary>
-        /// Clears the drawing area and returns the Pen to 0,0
-        /// </summary>
-        public void Reset()
-        {
-            penX = 0;
-            penY = 0;
-            pictureBox1.Refresh();
-            using (Graphics g = pictureBox1.CreateGraphics())
-            {
-                Brush markerBrush = Brushes.Blue;
-                g.FillEllipse(markerBrush, 0, 0, 10, 10);
-            }
-            fillEnabled = false;
-            penColor = Color.Black;
-
-
-        }
-
-        /// <summary>
         /// Executes a single-line command.
         /// </summary>
         /// <param name="command">The command to execute.</param>
@@ -211,8 +213,10 @@ namespace GraphicalCommandInterpreter
 
         private void button3_Click(object sender, EventArgs e)
         {
+            fillEnabled = false;
             string commands = richTextBox1.Text.Trim();
             ExecuteMultiLineCommands(commands);
+            
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -223,7 +227,8 @@ namespace GraphicalCommandInterpreter
         /// <summary>
         /// Saves the content of the richTextBox1 to a selected text file.
         /// </summary>
-        private void button2_Click(object sender, EventArgs e)
+        /// 
+        public void button2_Click(object sender, EventArgs e)
         {
             // Show a SaveFileDialog to allow the user to choose where to save the file
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
@@ -253,7 +258,7 @@ namespace GraphicalCommandInterpreter
         /// <summary>
         /// Loads the content of a selected text file into richTextBox1.
         /// </summary>
-        private void button1_Click(object sender, EventArgs e)
+        public void button1_Click(object sender, EventArgs e)
         {
             // Show an OpenFileDialog to allow the user to choose a file to open
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -277,6 +282,34 @@ namespace GraphicalCommandInterpreter
                         MessageBox.Show($"Error loading file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
+            }
+        }
+
+        public void SaveFile(string filePath)
+        {
+            try
+            {
+                // Save the content of richTextBox1 to the specified file
+                System.IO.File.WriteAllText(filePath, richTextBox1.Text);
+                MessageBox.Show("File saved successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public void LoadFile(string filePath)
+        {
+            try
+            {
+                // Load the content of the specified file into richTextBox1
+                richTextBox1.Text = System.IO.File.ReadAllText(filePath);
+                MessageBox.Show("File loaded successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

@@ -124,7 +124,7 @@ namespace GraphicalCommandInterpreter
                             }
                             break;
                         /// <summary>
-                        /// Determines if shape drawn is outlined or filled by pen's clour
+                        /// Determines if shape drawn is outlined or filled by pen's colour
                         /// </summary>
                         case "fill":
                             if (parts.Length == 2)

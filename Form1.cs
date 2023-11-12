@@ -221,8 +221,7 @@ namespace GraphicalCommandInterpreter
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            // Handle PictureBox click event if needed
-            // ...
+            
         }
         /// <summary>
         /// Saves the content of the richTextBox1 to a selected text file.

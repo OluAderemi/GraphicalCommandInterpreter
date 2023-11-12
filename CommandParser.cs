@@ -221,7 +221,7 @@ namespace GraphicalCommandInterpreter
             }
             catch (InvalidCommandException ex)
             {
-                // Handle the exception here, e.g., display a message to the user
+                // Display a message to the user
                 MessageBox.Show($"Error in command '{ex.InvalidCommand}': {ex.Message}", "Invalid Command.", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 throw ex;
             }

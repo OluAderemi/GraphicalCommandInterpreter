@@ -41,6 +41,12 @@ namespace GraphicalCommandInterpreter
 
         private bool inLoopBlock = false;
         private int loopIterations = 0;
+        private List<string> loopBlockCommands = new List<string>();
+
+
+
+
+
         /// <summary>
         /// Handles the specified graphical command and performs the corresponding action on the given form.
         /// </summary>
@@ -56,34 +62,12 @@ namespace GraphicalCommandInterpreter
                     if (command.Trim().ToLower() == "endif")
                     {
                         inIfBlock = false;
+                        skipCommands = false;  // Reset skipCommands to false after processing endif
                     }
-                    else if (!ifConditionMet)
+                    else if (ifConditionMet)
                     {
                         return; // Skip commands within a false if block
                     }
-                }
-                else if (inLoopBlock)
-                {
-                    // Store commands in the loop block
-                    loopBlockCommands.Add(command);
-
-                    if (command.Trim().ToLower() == "endloop")
-                    {
-                        // Execute the loop block
-                        for (int i = 0; i < loopIterations; i++)
-                        {
-                            foreach (string loopCommand in loopBlockCommands)
-                            {
-                                HandleCommand(form, loopCommand);
-                            }
-                        }
-
-                        // Reset loop-related variables
-                        inLoopBlock = false;
-                        loopIterations = 0;
-                        loopBlockCommands.Clear();
-                    }
-                    return;
                 }
                 else if (inLoopBlock)
                 {
@@ -104,6 +88,49 @@ namespace GraphicalCommandInterpreter
                         return;
                     }
                 }
+                /*else if (inLoopBlock)
+                {
+                    if (loopIterations > 0)
+                    {
+                        for (int i = 0; i < loopIterations; i++)
+                        {
+                            foreach (string loopCommand in loopBlockCommands)
+                            {
+                                if (ifConditionMet)  // Check if the condition is still met
+                                {
+                                    HandleCommand(form, loopCommand);
+                                }
+                            }
+                        }
+                    }
+
+                    // Reset loop-related variables
+                    inLoopBlock = false;
+                    loopIterations = 0;
+                    loopBlockCommands.Clear();
+                    return;
+               
+
+            }
+                else if (inLoopBlock)
+                {
+                    if (command.Trim().ToLower() == "endloop")
+                    {
+                        inLoopBlock = false;
+                    }
+                    else
+                    {
+                        // Execute the loop block
+                        if (loopIterations > 0)
+                        {
+                            for (int i = 0; i < loopIterations; i++)
+                            {
+                                ExecuteCommandBlock(form, command);
+                            }
+                        }
+                        return;
+                    }
+                }*/
                 string[] commandLines = command.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (string line in commandLines)
@@ -124,7 +151,7 @@ namespace GraphicalCommandInterpreter
                     if (parts.Length >= 3 && parts[1] == "=")
                     {
                         HandleVariableAssignment(parts);
-      
+
                         continue;
 
                     }
@@ -132,38 +159,56 @@ namespace GraphicalCommandInterpreter
                     {
                         switch (commandType)
                         {
-
                             case "if":
-                                if (parts.Length == 2)
-                                {
-                                    string condition = parts[1];
-                                    ifConditionMet = EvaluateCondition(condition);
-                                    inIfBlock = true;
-                                    skipCommands = !ifConditionMet;  // Set skipCommands based on ifConditionMet
-                                }
-                                else
-                                {
-                                    throw new InvalidCommandException(line, "Invalid parameter for if command. if takes a condition, e.g., if count > size");
-                                }
+                                
+                                     string condition = string.Join(" ", parts.Skip(1));
+                                skipCommands = true;
+                                 
                                 break;
+                                    /*case "if":
+                                        if (parts.Length == 4)
+                                        {
+                                            // Join the parts into a single condition string
+                                           // string condition = string.Join(" ", parts.Skip(1));
+                                           // ifConditionMet = EvaluateCondition(condition);
+                                            //inIfBlock = true;
 
-                            case "loop":
-                                if (parts.Length == 2)
-                                {
-                                    if (int.TryParse(parts[1], out loopIterations))
-                                    {
+
+                                            *//*if (!ifConditionMet)
+                                            {
+                                                // If the condition is false, set skipCommands to true
+                                                skipCommands = true;
+                                            }*//*
+                                        }
+                                        else
+                                        {
+                                            throw new InvalidCommandException(line, "Invalid parameter for if command. if takes a condition, e.g., if count > size");
+                                        }
+                                        break;
+
+                                    case "endif":
                                         inLoopBlock = true;
-                                    }
-                                    else
-                                    {
-                                        throw new InvalidCommandException(line, "Invalid parameter for loop command. loop takes an integer, e.g., loop 5");
-                                    }
-                                }
-                                else
-                                {
-                                    throw new InvalidCommandException(line, "Invalid parameter for loop command. loop takes an integer, e.g., loop 5");
-                                }
-                                break;
+                                        skipCommands = false;
+                                        break;*/
+
+
+                                    /*case "loop":
+                                        if (parts.Length == 2)
+                                        {
+                                            if (int.TryParse(parts[1], out loopIterations))
+                                            {
+                                               // inLoopBlock = true;
+                                            }
+                                            else
+                                            {
+                                                throw new InvalidCommandException(line, "Invalid parameter for loop command. loop takes an integer, e.g., loop 5");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            throw new InvalidCommandException(line, "Invalid parameter for loop command. loop takes an integer, e.g., loop 5");
+                                        }
+                                        break;*/
                             case "moveto":
                                 if (parts.Length == 3)
                                 {
@@ -289,6 +334,10 @@ namespace GraphicalCommandInterpreter
                                     {
                                         form.DrawCircle(radius);
                                     }
+                                    else if (variables.TryGetValue(parts[1], out radius))
+                                    {
+                                        form.DrawCircle(radius);
+                                    }
                                     else
                                     {
                                         throw new InvalidCommandException(line, "Invalid radius specified for circle command. Circle takes a radius e.g. circle 40");
@@ -331,6 +380,10 @@ namespace GraphicalCommandInterpreter
                                     {
                                         form.DrawTriangle(adj, @base, hyp);
                                     }
+                                    else if (variables.TryGetValue(parts[1], out adj) && variables.TryGetValue(parts[2], out @base) && variables.TryGetValue(parts[2], out hyp))
+                                    {
+                                        form.DrawTriangle(adj, @base, hyp);
+                                    }
                                     else
                                     {
                                         throw new InvalidCommandException(line, "Invalid dimensions specified for triangle command. Triangle takes adjacent, base and hypotenuse, e.g. triangle 80,90,100");
@@ -351,7 +404,7 @@ namespace GraphicalCommandInterpreter
                                 throw new InvalidCommandException(line, "Valid Commands include: moveto, drawto, pen, fill, clear, reset, circle, rectangle, and triangle. Try one");
                         }
                     }
-                    
+
                 }
             }
             catch (InvalidCommandException ex)
@@ -391,50 +444,71 @@ namespace GraphicalCommandInterpreter
         }
 
 
-        private List<string> loopBlockCommands = new List<string>();
+        //private List<string> loopBlockCommands = new List<string>();
 
         private bool EvaluateCondition(string condition)
         {
             // Implement a simple condition parser
             var tokens = condition.Split(' ');
 
-            if (tokens.Length != 3)
+            if (tokens.Length == 3)
+            {
+                string variableOrValue1 = tokens[0];
+                string comparisonOperator = tokens[1];
+                string variableOrValue2 = tokens[2];
+
+                int value1, value2;
+
+                // Check if variableOrValue1 is a variable or numeric value
+                if (variables.TryGetValue(variableOrValue1, out int variableValue1))
+                {
+                    value1 = variableValue1;
+                }
+                else if (int.TryParse(variableOrValue1, out value1))
+                {
+                    throw new InvalidCommandException(condition, $"Invalid value or variable '{variableOrValue1}' in the condition");
+                }
+
+                // Check if variableOrValue2 is a variable or numeric value
+                if (variables.TryGetValue(variableOrValue2, out int variableValue2))
+                {
+                    value2 = variableValue2;
+                }
+                else if (int.TryParse(variableOrValue2, out value2))
+                {
+                    throw new InvalidCommandException(condition, $"Invalid value or variable '{variableOrValue2}' in the condition");
+                }
+
+                switch (comparisonOperator)
+                {
+                    case "==":
+                        return value1 == value2;
+                    case "!=":
+                        return value1 != value2;
+                    case ">":
+                        return value1 > value2;
+                    case "<":
+                        return value1 < value2;
+                    case ">=":
+                        return value1 >= value2;
+                    case "<=":
+                        return value1 <= value2;
+                    default:
+                        throw new InvalidCommandException(condition, $"Invalid comparison operator '{comparisonOperator}'");
+                }
+            }
+            else if (tokens.Length == 1)
+            {
+                // Handle simple boolean condition (e.g., "if true" or "if false")
+                return bool.Parse(tokens[0]);
+            }
+            else
             {
                 throw new InvalidCommandException(condition, "Invalid condition format");
             }
-
-            string variable = tokens[0];
-            string comparisonOperator = tokens[1];
-            string valueStr = tokens[2];
-
-            if (!variables.TryGetValue(variable, out int variableValue))
-            {
-                throw new InvalidCommandException(condition, $"Variable '{variable}' not found");
-            }
-
-            if (!int.TryParse(valueStr, out int comparisonValue))
-            {
-                throw new InvalidCommandException(condition, $"Invalid value '{valueStr}' in the condition");
-            }
-
-            switch (comparisonOperator)
-            {
-                case "==":
-                    return variableValue == comparisonValue;
-                case "!=":
-                    return variableValue != comparisonValue;
-                case ">":
-                    return variableValue > comparisonValue;
-                case "<":
-                    return variableValue < comparisonValue;
-                case ">=":
-                    return variableValue >= comparisonValue;
-                case "<=":
-                    return variableValue <= comparisonValue;
-                default:
-                    throw new InvalidCommandException(condition, $"Invalid comparison operator '{comparisonOperator}'");
-            }
         }
+
+
 
 
         private void ExecuteCommandBlock(Form1 form, string commandBlock)
@@ -443,8 +517,13 @@ namespace GraphicalCommandInterpreter
             string[] commands = commandBlock.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (string command in commands)
             {
+                loopBlockCommands.Add(command);
                 HandleCommand(form, command);
             }
+
+            // Clear the loop block commands after execution
+            loopBlockCommands.Clear();
         }
+
     }
 }

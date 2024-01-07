@@ -33,20 +33,6 @@ namespace GraphicalCommandInterpreter
     {
         private Dictionary<string, int> variables = new Dictionary<string, int>();
 
-
-        private bool inIfBlock = false;
-        private bool ifConditionMet = false;
-        private bool skipCommands = false;
-
-
-        private bool inLoopBlock = false;
-        private int loopIterations = 0;
-        private List<string> loopBlockCommands = new List<string>();
-
-
-
-
-
         /// <summary>
         /// Handles the specified graphical command and performs the corresponding action on the given form.
         /// </summary>
@@ -55,82 +41,10 @@ namespace GraphicalCommandInterpreter
         /// <exception cref="InvalidCommandException">Thrown when the command is invalid or contains errors.</exception>
         public void HandleCommand(Form1 form, string command)
         {
+            bool executeLinesFlag = true;
             try
             {
-                if (inIfBlock)
-                {
-                    if (command.Trim().ToLower() == "endif")
-                    {
-                        inIfBlock = false;
-                        skipCommands = false;  // Reset skipCommands to false after processing endif
-                    }
-                    else if (ifConditionMet)
-                    {
-                        return; // Skip commands within a false if block
-                    }
-                }
-                else if (inLoopBlock)
-                {
-                    if (command.Trim().ToLower() == "endloop")
-                    {
-                        inLoopBlock = false;
-                    }
-                    else
-                    {
-                        // Execute the loop block
-                        if (loopIterations > 0)
-                        {
-                            for (int i = 0; i < loopIterations; i++)
-                            {
-                                ExecuteCommandBlock(form, command);
-                            }
-                        }
-                        return;
-                    }
-                }
-                /*else if (inLoopBlock)
-                {
-                    if (loopIterations > 0)
-                    {
-                        for (int i = 0; i < loopIterations; i++)
-                        {
-                            foreach (string loopCommand in loopBlockCommands)
-                            {
-                                if (ifConditionMet)  // Check if the condition is still met
-                                {
-                                    HandleCommand(form, loopCommand);
-                                }
-                            }
-                        }
-                    }
-
-                    // Reset loop-related variables
-                    inLoopBlock = false;
-                    loopIterations = 0;
-                    loopBlockCommands.Clear();
-                    return;
-               
-
-            }
-                else if (inLoopBlock)
-                {
-                    if (command.Trim().ToLower() == "endloop")
-                    {
-                        inLoopBlock = false;
-                    }
-                    else
-                    {
-                        // Execute the loop block
-                        if (loopIterations > 0)
-                        {
-                            for (int i = 0; i < loopIterations; i++)
-                            {
-                                ExecuteCommandBlock(form, command);
-                            }
-                        }
-                        return;
-                    }
-                }*/
+                //string conditions = string.Empty;
                 string[] commandLines = command.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (string line in commandLines)
@@ -138,6 +52,7 @@ namespace GraphicalCommandInterpreter
                     // Split the line using both spaces and commas
                     string[] parts = line.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
 
+                    
 
                     if (parts.Length < 1)
                     {
@@ -146,6 +61,69 @@ namespace GraphicalCommandInterpreter
                     }
 
                     string commandType = parts[0].ToLower();
+
+                    if (commandType == "if")
+                    {
+                        if (parts.Length == 4)
+                        {
+                            int operand1, operand2;
+
+                            // Check if operands are variables
+                            bool isOperand1Variable = variables.TryGetValue(parts[1], out operand1);
+                            bool isOperand2Variable = variables.TryGetValue(parts[3], out operand2);
+
+                            // If both operands are variables, update their values
+                            if (isOperand1Variable)
+                                variables[parts[1]] = operand1;
+                            if (isOperand2Variable)
+                                variables[parts[3]] = operand2;
+
+                            // Evaluate the if condition based on the operator
+                            switch (parts[2])
+                            {
+                                case "<":
+                                    executeLinesFlag = isOperand1Variable ? operand1 < operand2 : int.Parse(parts[1]) < operand2;
+                                    break;
+                                case ">":
+                                    executeLinesFlag = isOperand1Variable ? operand1 > operand2 : int.Parse(parts[1]) > operand2;
+                                    break;
+                                case "=":
+                                    executeLinesFlag = isOperand1Variable ? operand1 == operand2 : int.Parse(parts[1]) == operand2;
+                                    break;
+                                case ">=":
+                                    executeLinesFlag = isOperand1Variable ? operand1 >= operand2 : int.Parse(parts[1]) >= operand2;
+                                    break;
+                                case "<=":
+                                    executeLinesFlag = isOperand1Variable ? operand1 <= operand2 : int.Parse(parts[1]) <= operand2;
+                                    break;
+                                case "!=":
+                                    executeLinesFlag = isOperand1Variable ? operand1 != operand2 : int.Parse(parts[1]) != operand2;
+                                    break;
+                                default:
+                                    // Handle invalid operator
+                                    throw new InvalidCommandException(line, "Invalid operator in if statement. Supported operators are: <, >, =, >=, <=, !=");
+                            }
+
+                            
+
+                            // Display a message if the condition is not met
+                            if (!executeLinesFlag)
+                            {
+                                MessageBox.Show($"Condition '{line.Substring(3)}' is not met. Skipped the following commands.", "Condition Not Met", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
+                        }
+                        else
+                        {
+                            // Handle invalid if statement
+                            throw new InvalidCommandException(line, "Invalid if statement. Usage: if variable operator value");
+                        }
+                    }
+                    else if (commandType == "endif")
+                    {
+                        // Reset the executeLinesFlag when encountering endif
+                        executeLinesFlag = true;
+                    }
+
 
                     // Check if it's a variable assignment
                     if (parts.Length >= 3 && parts[1] == "=")
@@ -157,58 +135,13 @@ namespace GraphicalCommandInterpreter
                     }
                     else
                     {
-                        switch (commandType)
+                        if (executeLinesFlag)
+                            switch (commandType)
                         {
                             case "if":
-                                
-                                     string condition = string.Join(" ", parts.Skip(1));
-                                skipCommands = true;
-                                 
                                 break;
-                                    /*case "if":
-                                        if (parts.Length == 4)
-                                        {
-                                            // Join the parts into a single condition string
-                                           // string condition = string.Join(" ", parts.Skip(1));
-                                           // ifConditionMet = EvaluateCondition(condition);
-                                            //inIfBlock = true;
-
-
-                                            *//*if (!ifConditionMet)
-                                            {
-                                                // If the condition is false, set skipCommands to true
-                                                skipCommands = true;
-                                            }*//*
-                                        }
-                                        else
-                                        {
-                                            throw new InvalidCommandException(line, "Invalid parameter for if command. if takes a condition, e.g., if count > size");
-                                        }
-                                        break;
-
-                                    case "endif":
-                                        inLoopBlock = true;
-                                        skipCommands = false;
-                                        break;*/
-
-
-                                    /*case "loop":
-                                        if (parts.Length == 2)
-                                        {
-                                            if (int.TryParse(parts[1], out loopIterations))
-                                            {
-                                               // inLoopBlock = true;
-                                            }
-                                            else
-                                            {
-                                                throw new InvalidCommandException(line, "Invalid parameter for loop command. loop takes an integer, e.g., loop 5");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            throw new InvalidCommandException(line, "Invalid parameter for loop command. loop takes an integer, e.g., loop 5");
-                                        }
-                                        break;*/
+                            case "endif":
+                                break;
                             case "moveto":
                                 if (parts.Length == 3)
                                 {
@@ -332,12 +265,18 @@ namespace GraphicalCommandInterpreter
                                     int radius;
                                     if (int.TryParse(parts[1], out radius))
                                     {
-                                        form.DrawCircle(radius);
-                                    }
+                                            if (executeLinesFlag)
+                                            {
+                                                form.DrawCircle(radius);
+                                            }
+                                        }
                                     else if (variables.TryGetValue(parts[1], out radius))
                                     {
-                                        form.DrawCircle(radius);
-                                    }
+                                            if (executeLinesFlag)
+                                            {
+                                                form.DrawCircle(radius);
+                                            }
+                                        }
                                     else
                                     {
                                         throw new InvalidCommandException(line, "Invalid radius specified for circle command. Circle takes a radius e.g. circle 40");
@@ -355,11 +294,17 @@ namespace GraphicalCommandInterpreter
                                     int width, height;
                                     if (int.TryParse(parts[1], out width) && int.TryParse(parts[2], out height))
                                     {
-                                        form.DrawRectangle(width, height);
+                                            if (executeLinesFlag)
+                                            {
+                                                form.DrawRectangle(width, height);
+                                            }
                                     }
                                     else if (variables.TryGetValue(parts[1], out width) && variables.TryGetValue(parts[2], out height))
                                     {
-                                        form.DrawRectangle(width, height);
+                                            if (executeLinesFlag)
+                                            {
+                                                form.DrawRectangle(width, height);
+                                            }
                                     }
                                     else
                                     {
@@ -378,11 +323,17 @@ namespace GraphicalCommandInterpreter
                                     int adj, @base, hyp;
                                     if (int.TryParse(parts[1], out adj) && int.TryParse(parts[2], out @base) && int.TryParse(parts[3], out hyp))
                                     {
-                                        form.DrawTriangle(adj, @base, hyp);
-                                    }
+                                            if (executeLinesFlag)
+                                            {
+                                                form.DrawTriangle(adj, @base, hyp);
+                                            }
+                                        }
                                     else if (variables.TryGetValue(parts[1], out adj) && variables.TryGetValue(parts[2], out @base) && variables.TryGetValue(parts[2], out hyp))
                                     {
-                                        form.DrawTriangle(adj, @base, hyp);
+                                            if (executeLinesFlag)
+                                            {
+                                                form.DrawTriangle(adj, @base, hyp);
+                                            }
                                     }
                                     else
                                     {
@@ -396,15 +347,9 @@ namespace GraphicalCommandInterpreter
                                 break;
 
                             default:
-                                if (!skipCommands)  // Only execute the command if skipCommands is false
-                                {
-                                    HandleCommand(form, command);
-                                }
-                                break;
                                 throw new InvalidCommandException(line, "Valid Commands include: moveto, drawto, pen, fill, clear, reset, circle, rectangle, and triangle. Try one");
                         }
                     }
-
                 }
             }
             catch (InvalidCommandException ex)
@@ -444,86 +389,12 @@ namespace GraphicalCommandInterpreter
         }
 
 
-        //private List<string> loopBlockCommands = new List<string>();
+        
 
-        private bool EvaluateCondition(string condition)
-        {
-            // Implement a simple condition parser
-            var tokens = condition.Split(' ');
-
-            if (tokens.Length == 3)
-            {
-                string variableOrValue1 = tokens[0];
-                string comparisonOperator = tokens[1];
-                string variableOrValue2 = tokens[2];
-
-                int value1, value2;
-
-                // Check if variableOrValue1 is a variable or numeric value
-                if (variables.TryGetValue(variableOrValue1, out int variableValue1))
-                {
-                    value1 = variableValue1;
-                }
-                else if (int.TryParse(variableOrValue1, out value1))
-                {
-                    throw new InvalidCommandException(condition, $"Invalid value or variable '{variableOrValue1}' in the condition");
-                }
-
-                // Check if variableOrValue2 is a variable or numeric value
-                if (variables.TryGetValue(variableOrValue2, out int variableValue2))
-                {
-                    value2 = variableValue2;
-                }
-                else if (int.TryParse(variableOrValue2, out value2))
-                {
-                    throw new InvalidCommandException(condition, $"Invalid value or variable '{variableOrValue2}' in the condition");
-                }
-
-                switch (comparisonOperator)
-                {
-                    case "==":
-                        return value1 == value2;
-                    case "!=":
-                        return value1 != value2;
-                    case ">":
-                        return value1 > value2;
-                    case "<":
-                        return value1 < value2;
-                    case ">=":
-                        return value1 >= value2;
-                    case "<=":
-                        return value1 <= value2;
-                    default:
-                        throw new InvalidCommandException(condition, $"Invalid comparison operator '{comparisonOperator}'");
-                }
-            }
-            else if (tokens.Length == 1)
-            {
-                // Handle simple boolean condition (e.g., "if true" or "if false")
-                return bool.Parse(tokens[0]);
-            }
-            else
-            {
-                throw new InvalidCommandException(condition, "Invalid condition format");
-            }
-        }
+   
 
 
 
-
-        private void ExecuteCommandBlock(Form1 form, string commandBlock)
-        {
-            // Execute the commands in the block (e.g., for loop iterations)
-            string[] commands = commandBlock.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (string command in commands)
-            {
-                loopBlockCommands.Add(command);
-                HandleCommand(form, command);
-            }
-
-            // Clear the loop block commands after execution
-            loopBlockCommands.Clear();
-        }
 
     }
 }

@@ -52,7 +52,7 @@ namespace GraphicalCommandInterpreter
                     // Split the line using both spaces and commas
                     string[] parts = line.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-                    
+
 
                     if (parts.Length < 1)
                     {
@@ -77,12 +77,13 @@ namespace GraphicalCommandInterpreter
                                 variables[parts[1]] = operand1;
                             if (isOperand2Variable)
                                 variables[parts[3]] = operand2;
-
-                            // Evaluate the if condition based on the operator
-                            switch (parts[2])
+                            if (variables.TryGetValue(parts[1], out operand1) && int.TryParse(parts[3], out operand2))
+                                // Evaluate the if condition based on the operator
+                                switch (parts[2])
                             {
                                 case "<":
                                     executeLinesFlag = isOperand1Variable ? operand1 < operand2 : int.Parse(parts[1]) < operand2;
+                                    //executeLinesFlag = isOperand1Variable ? operand1 < operand2 : (int.TryParse(parts[1], out int intValue) ? intValue < operand2 : false);
                                     break;
                                 case ">":
                                     executeLinesFlag = isOperand1Variable ? operand1 > operand2 : int.Parse(parts[1]) > operand2;
@@ -104,7 +105,7 @@ namespace GraphicalCommandInterpreter
                                     throw new InvalidCommandException(line, "Invalid operator in if statement. Supported operators are: <, >, =, >=, <=, !=");
                             }
 
-                            
+
 
                             // Display a message if the condition is not met
                             if (!executeLinesFlag)
@@ -137,218 +138,218 @@ namespace GraphicalCommandInterpreter
                     {
                         if (executeLinesFlag)
                             switch (commandType)
-                        {
-                            case "if":
-                                break;
-                            case "endif":
-                                break;
-                            case "moveto":
-                                if (parts.Length == 3)
-                                {
-                                    int x, y;
-                                    if (int.TryParse(parts[1], out x) && int.TryParse(parts[2], out y))
+                            {
+                                case "if":
+                                    break;
+                                case "endif":
+                                    break;
+                                case "moveto":
+                                    if (parts.Length == 3)
                                     {
-                                        form.penX = x;
-                                        form.penY = y;
-                                        form.MoveTo();
-                                    }
-                                    else if (variables.TryGetValue(parts[1], out x) && variables.TryGetValue(parts[2], out y))
-                                    {
-                                        form.penX = x;
-                                        form.penY = y;
-                                        form.MoveTo();
-                                    }
-                                    else
-                                    {
-                                        throw new InvalidCommandException(line, "Invalid coordinates for moveto command. Moveto takes two integer coordinates or variable references, e.g., moveto 100,100 or moveto num1, num2");
-                                    }
-                                }
-                                else
-                                {
-                                    throw new InvalidCommandException(line, "Invalid parameters for moveto command. Moveto takes two integer coordinates or variable references, e.g., moveto 100,100 or moveto num1, num2");
-                                }
-                                break;
-
-
-                            case "drawto":
-                                if (parts.Length == 3)
-                                {
-                                    int x, y;
-                                    if (int.TryParse(parts[1], out x) && int.TryParse(parts[2], out y))
-                                    {
-                                        form.penX = x;
-                                        form.penY = y;
-                                        form.DrawTo();
-                                    }
-                                    else if (variables.TryGetValue(parts[1], out x) && variables.TryGetValue(parts[2], out y))
-                                    {
-                                        form.penX = x;
-                                        form.penY = y;
-                                        form.MoveTo();
+                                        int x, y;
+                                        if (int.TryParse(parts[1], out x) && int.TryParse(parts[2], out y))
+                                        {
+                                            form.penX = x;
+                                            form.penY = y;
+                                            form.MoveTo();
+                                        }
+                                        else if (variables.TryGetValue(parts[1], out x) && variables.TryGetValue(parts[2], out y))
+                                        {
+                                            form.penX = x;
+                                            form.penY = y;
+                                            form.MoveTo();
+                                        }
+                                        else
+                                        {
+                                            throw new InvalidCommandException(line, "Invalid coordinates for moveto command. Moveto takes two integer coordinates or variable references, e.g., moveto 100,100 or moveto num1, num2");
+                                        }
                                     }
                                     else
                                     {
-                                        throw new InvalidCommandException(line, "Invalid coordinates for drawto command. Drawto takes two integer coordinates, e.g drawto 100,100");
+                                        throw new InvalidCommandException(line, "Invalid parameters for moveto command. Moveto takes two integer coordinates or variable references, e.g., moveto 100,100 or moveto num1, num2");
                                     }
-                                }
-                                else
-                                {
-                                    throw new InvalidCommandException(line, "Invalid parameters for drawto command. Drawto takes two integer coordinates, e.g drawto 100,100");
-                                }
-                                break;
+                                    break;
 
-                            /// <summary>
-                            /// Changes the pen colour
-                            /// </summary>
-                            case "pen":
-                                if (parts.Length == 2)
-                                {
-                                    string color = parts[1].ToLower();
-                                    switch (color)
+
+                                case "drawto":
+                                    if (parts.Length == 3)
                                     {
-                                        case "red":
-                                            form.SetPenColor(Color.Red);
-                                            break;
-                                        case "green":
-                                            form.SetPenColor(Color.Green);
-                                            break;
-                                        case "black":
-                                            form.SetPenColor(Color.Black);
-                                            break;
-                                        // Add more color options as needed
-                                        default:
-                                            throw new InvalidCommandException(line, "Invalid colour specified for pen command. try red, green or black");
+                                        int x, y;
+                                        if (int.TryParse(parts[1], out x) && int.TryParse(parts[2], out y))
+                                        {
+                                            form.penX = x;
+                                            form.penY = y;
+                                            form.DrawTo();
+                                        }
+                                        else if (variables.TryGetValue(parts[1], out x) && variables.TryGetValue(parts[2], out y))
+                                        {
+                                            form.penX = x;
+                                            form.penY = y;
+                                            form.MoveTo();
+                                        }
+                                        else
+                                        {
+                                            throw new InvalidCommandException(line, "Invalid coordinates for drawto command. Drawto takes two integer coordinates, e.g drawto 100,100");
+                                        }
                                     }
-                                }
-                                else
-                                {
-                                    throw new InvalidCommandException(line, "Invalid parameter for pen command. pen takes a colour, e.g. pen red");
-                                }
-                                break;
-                            /// <summary>
-                            /// Determines if shape drawn is outlined or filled by pen's colour
-                            /// </summary>
-                            case "fill":
-                                if (parts.Length == 2)
-                                {
-                                    string fillStatus = parts[1].ToLower();
-                                    switch (fillStatus)
+                                    else
                                     {
-                                        case "on":
-                                            form.SetFillStatus(true);
-                                            break;
-                                        case "off":
-                                            form.SetFillStatus(false);
-                                            break;
-                                        // Add more options as needed
-                                        default:
-                                            throw new InvalidCommandException(line, "Invalid fill status specified for fill command. Fill is either on or off, e.g fill on");
+                                        throw new InvalidCommandException(line, "Invalid parameters for drawto command. Drawto takes two integer coordinates, e.g drawto 100,100");
                                     }
-                                }
-                                else
-                                {
-                                    throw new InvalidCommandException(line, "Invalid parameter for fill command. Fill is either on or off, e.g fill on");
-                                }
-                                break;
+                                    break;
 
-                            case "clear":
-                                form.ClearDrawingArea();
-                                break;
-
-                            case "reset":
-                                form.Reset();
-                                break;
-
-                            case "circle":
-                                if (parts.Length == 2)
-                                {
-                                    int radius;
-                                    if (int.TryParse(parts[1], out radius))
+                                /// <summary>
+                                /// Changes the pen colour
+                                /// </summary>
+                                case "pen":
+                                    if (parts.Length == 2)
                                     {
+                                        string color = parts[1].ToLower();
+                                        switch (color)
+                                        {
+                                            case "red":
+                                                form.SetPenColor(Color.Red);
+                                                break;
+                                            case "green":
+                                                form.SetPenColor(Color.Green);
+                                                break;
+                                            case "black":
+                                                form.SetPenColor(Color.Black);
+                                                break;
+                                            // Add more color options as needed
+                                            default:
+                                                throw new InvalidCommandException(line, "Invalid colour specified for pen command. try red, green or black");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new InvalidCommandException(line, "Invalid parameter for pen command. pen takes a colour, e.g. pen red");
+                                    }
+                                    break;
+                                /// <summary>
+                                /// Determines if shape drawn is outlined or filled by pen's colour
+                                /// </summary>
+                                case "fill":
+                                    if (parts.Length == 2)
+                                    {
+                                        string fillStatus = parts[1].ToLower();
+                                        switch (fillStatus)
+                                        {
+                                            case "on":
+                                                form.SetFillStatus(true);
+                                                break;
+                                            case "off":
+                                                form.SetFillStatus(false);
+                                                break;
+                                            // Add more options as needed
+                                            default:
+                                                throw new InvalidCommandException(line, "Invalid fill status specified for fill command. Fill is either on or off, e.g fill on");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new InvalidCommandException(line, "Invalid parameter for fill command. Fill is either on or off, e.g fill on");
+                                    }
+                                    break;
+
+                                case "clear":
+                                    form.ClearDrawingArea();
+                                    break;
+
+                                case "reset":
+                                    form.Reset();
+                                    break;
+
+                                case "circle":
+                                    if (parts.Length == 2)
+                                    {
+                                        int radius;
+                                        if (int.TryParse(parts[1], out radius))
+                                        {
                                             if (executeLinesFlag)
                                             {
                                                 form.DrawCircle(radius);
                                             }
                                         }
-                                    else if (variables.TryGetValue(parts[1], out radius))
-                                    {
+                                        else if (variables.TryGetValue(parts[1], out radius))
+                                        {
                                             if (executeLinesFlag)
                                             {
                                                 form.DrawCircle(radius);
                                             }
                                         }
+                                        else
+                                        {
+                                            throw new InvalidCommandException(line, "Invalid radius specified for circle command. Circle takes a radius e.g. circle 40");
+                                        }
+                                    }
                                     else
                                     {
-                                        throw new InvalidCommandException(line, "Invalid radius specified for circle command. Circle takes a radius e.g. circle 40");
+                                        throw new InvalidCommandException(line, "Invalid parameter for circle command. Circle takes a radius e.g. circle 40");
                                     }
-                                }
-                                else
-                                {
-                                    throw new InvalidCommandException(line, "Invalid parameter for circle command. Circle takes a radius e.g. circle 40");
-                                }
-                                break;
+                                    break;
 
-                            case "rectangle":
-                                if (parts.Length == 3)
-                                {
-                                    int width, height;
-                                    if (int.TryParse(parts[1], out width) && int.TryParse(parts[2], out height))
+                                case "rectangle":
+                                    if (parts.Length == 3)
                                     {
+                                        int width, height;
+                                        if (int.TryParse(parts[1], out width) && int.TryParse(parts[2], out height))
+                                        {
                                             if (executeLinesFlag)
                                             {
                                                 form.DrawRectangle(width, height);
                                             }
-                                    }
-                                    else if (variables.TryGetValue(parts[1], out width) && variables.TryGetValue(parts[2], out height))
-                                    {
+                                        }
+                                        else if (variables.TryGetValue(parts[1], out width) && variables.TryGetValue(parts[2], out height))
+                                        {
                                             if (executeLinesFlag)
                                             {
                                                 form.DrawRectangle(width, height);
                                             }
+                                        }
+                                        else
+                                        {
+                                            throw new InvalidCommandException(line, "Invalid dimensions specified for rectangle command. Rectangle takes width and height, e.g. rectangle 80,95");
+                                        }
                                     }
                                     else
                                     {
-                                        throw new InvalidCommandException(line, "Invalid dimensions specified for rectangle command. Rectangle takes width and height, e.g. rectangle 80,95");
+                                        throw new InvalidCommandException(line, "Invalid parameters for rectangle command. Rectangle takes width and height, e.g. rectangle 80,95");
                                     }
-                                }
-                                else
-                                {
-                                    throw new InvalidCommandException(line, "Invalid parameters for rectangle command. Rectangle takes width and height, e.g. rectangle 80,95");
-                                }
-                                break;
+                                    break;
 
-                            case "triangle":
-                                if (parts.Length == 4)
-                                {
-                                    int adj, @base, hyp;
-                                    if (int.TryParse(parts[1], out adj) && int.TryParse(parts[2], out @base) && int.TryParse(parts[3], out hyp))
+                                case "triangle":
+                                    if (parts.Length == 4)
                                     {
+                                        int adj, @base, hyp;
+                                        if (int.TryParse(parts[1], out adj) && int.TryParse(parts[2], out @base) && int.TryParse(parts[3], out hyp))
+                                        {
                                             if (executeLinesFlag)
                                             {
                                                 form.DrawTriangle(adj, @base, hyp);
                                             }
                                         }
-                                    else if (variables.TryGetValue(parts[1], out adj) && variables.TryGetValue(parts[2], out @base) && variables.TryGetValue(parts[2], out hyp))
-                                    {
+                                        else if (variables.TryGetValue(parts[1], out adj) && variables.TryGetValue(parts[2], out @base) && variables.TryGetValue(parts[2], out hyp))
+                                        {
                                             if (executeLinesFlag)
                                             {
                                                 form.DrawTriangle(adj, @base, hyp);
                                             }
+                                        }
+                                        else
+                                        {
+                                            throw new InvalidCommandException(line, "Invalid dimensions specified for triangle command. Triangle takes adjacent, base and hypotenuse, e.g. triangle 80,90,100");
+                                        }
                                     }
                                     else
                                     {
-                                        throw new InvalidCommandException(line, "Invalid dimensions specified for triangle command. Triangle takes adjacent, base and hypotenuse, e.g. triangle 80,90,100");
+                                        throw new InvalidCommandException(line, "Invalid parameters for triangle command. Triangle takes adjacent, base and hypotenuse, e.g. triangle 80,90,100");
                                     }
-                                }
-                                else
-                                {
-                                    throw new InvalidCommandException(line, "Invalid parameters for triangle command. Triangle takes adjacent, base and hypotenuse, e.g. triangle 80,90,100");
-                                }
-                                break;
+                                    break;
 
-                            default:
-                                throw new InvalidCommandException(line, "Valid Commands include: moveto, drawto, pen, fill, clear, reset, circle, rectangle, and triangle. Try one");
-                        }
+                                default:
+                                    throw new InvalidCommandException(line, "Valid Commands include: moveto, drawto, pen, fill, clear, reset, circle, rectangle, and triangle. Try one");
+                            }
                     }
                 }
             }
@@ -389,9 +390,9 @@ namespace GraphicalCommandInterpreter
         }
 
 
-        
 
-   
+
+
 
 
 

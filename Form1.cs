@@ -361,12 +361,6 @@ namespace GraphicalCommandInterpreter
             CheckCommandErrors(commandsToCheck);
         }
 
-        /// <summary>
-        /// Performs syntax checking on the specified graphical command.
-        /// </summary>
-        /// <param name="command">The graphical command to check for syntax errors.</param>
-        /// <exception cref="InvalidCommandException">Thrown when the command has syntax errors.</exception>
-
         private void CheckCommandErrors(string commands)
         {
             try

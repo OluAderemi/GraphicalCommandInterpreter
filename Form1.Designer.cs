@@ -103,6 +103,7 @@
             button4.TabIndex = 6;
             button4.Text = "Syntax";
             button4.UseVisualStyleBackColor = true;
+            button4.Click += button4_Click;
             // 
             // Form1
             // 

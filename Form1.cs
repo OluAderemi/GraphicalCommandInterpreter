@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Text;
 using System.Windows.Forms;
 
 namespace GraphicalCommandInterpreter
@@ -57,7 +58,7 @@ namespace GraphicalCommandInterpreter
             fillEnabled = status;
         }
 
-        
+
 
         /// <summary>
         /// Clears the drawing area and returns the Pen to 0,0
@@ -88,7 +89,7 @@ namespace GraphicalCommandInterpreter
                 Brush markerBrush = Brushes.Blue;
                 g.FillEllipse(markerBrush, penX, penY, 10, 10);
             }
-           
+
 
         }
 
@@ -216,12 +217,12 @@ namespace GraphicalCommandInterpreter
             fillEnabled = false;
             string commands = richTextBox1.Text.Trim();
             ExecuteMultiLineCommands(commands);
-            
+
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            
+
         }
         /// <summary>
         /// Saves the content of the richTextBox1 to a selected text file.
@@ -317,5 +318,40 @@ namespace GraphicalCommandInterpreter
 
         }
 
+        private void button4_Click(object sender, EventArgs e)
+        {
+            // Get the commands from the richTextBox1
+            string commandsToCheck = richTextBox1.Text.Trim();
+
+            // Call the method to check for errors
+            CheckCommandErrors(commandsToCheck);
+        }
+
+        private void CheckCommandErrors(string commands)
+        {
+            try
+            {
+                // Create a new instance of the CommandParser for error-checking only
+                CommandParser errorParser = new CommandParser();
+                // Use a dummy Form1 instance for error-checking
+                Form1 dummyForm = new Form1();
+
+                // Call the HandleCommand method for error-checking
+                errorParser.HandleCommand(dummyForm, commands);
+
+                // If no exceptions are thrown, the commands are valid
+                MessageBox.Show("All commands are valid and error-free.", "Command Check", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (InvalidCommandException ex)
+            {
+                // Display the error message if an invalid command is encountered
+                MessageBox.Show($"Error in command '{ex.InvalidCommand}': {ex.Message}", "Invalid Command", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions if needed
+                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
 }

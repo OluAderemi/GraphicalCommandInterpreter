@@ -32,10 +32,11 @@ namespace GraphicalCommandInterpreter
 
     public class CommandParser
     {
-        private Dictionary<string, int> variables = new Dictionary<string, int>();
+        public Dictionary<string, int> variables = new Dictionary<string, int>();
         // Dictionary to store defined methods
         private Dictionary<string, List<string>> methods = new Dictionary<string, List<string>>();
         private bool executeMethodLines = true;
+        public bool executeLinesFlag = true;
 
         /// <summary>
         /// Handles the specified graphical command and performs the corresponding action on the given form.
@@ -45,7 +46,7 @@ namespace GraphicalCommandInterpreter
         /// <exception cref="InvalidCommandException">Thrown when the command is invalid or contains errors.</exception>
         public void HandleCommand(Form1 form, string command)
         {
-            bool executeLinesFlag = true;
+            
             try
             {
                 //string conditions = string.Empty;
@@ -428,6 +429,21 @@ namespace GraphicalCommandInterpreter
             }*/
         }
 
+        /// <summary>
+        /// Handles the assignment of a value to a variable in the graphical command interpreter.
+        /// </summary>
+        /// <param name="parts">An array containing the parts of the command.</param>
+        /// <remarks>
+        /// This method is responsible for processing commands that assign a value to a variable, such as:
+        /// <code>
+        /// variableName = 42
+        /// </code>
+        /// The method checks if the value is a valid integer or a reference to an existing variable. If the
+        /// assignment is successful, it updates the variable's value in the dictionary.
+        /// </remarks>
+        /// <exception cref="InvalidCommandException">
+        /// Thrown when there is an error in the variable assignment command, such as an invalid value or reference.
+        /// </exception>
         public void HandleVariableAssignment(string[] parts)
         {
             string variable = parts[0];

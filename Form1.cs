@@ -182,6 +182,40 @@ namespace GraphicalCommandInterpreter
             }
         }
 
+        public void DrawPolygon(int[] parameters)
+        {
+            if (parameters.Length >= 3)  // Ensure there are at least three parameters for a polygon
+            {
+                // Assuming you have a method to draw a polygon in your form
+                // Replace this with your actual drawing logic
+                using (Graphics g = pictureBox1.CreateGraphics())
+                {
+                    // Calculate the center of the polygon (arbitrary for this example)
+                    int centerX = 200;
+                    int centerY = 200;
+
+                    Point[] points = new Point[parameters.Length];
+
+                    double angleIncrement = 2 * Math.PI / parameters.Length;
+
+                    for (int i = 0; i < parameters.Length; i++)
+                    {
+                        int x = (int)(centerX + parameters[i] * Math.Cos(i * angleIncrement));
+                        int y = (int)(centerY + parameters[i] * Math.Sin(i * angleIncrement));
+
+                        points[i] = new Point(x, y);
+                    }
+
+                    g.DrawPolygon(Pens.Black, points);
+                }
+            }
+            else
+            {
+                // Invalid number of parameters for a polygon
+                MessageBox.Show("Invalid number of parameters for DrawPolygon command.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         /// <summary>
         /// Executes a single-line command.
         /// </summary>

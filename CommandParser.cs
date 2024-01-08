@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace GraphicalCommandInterpreter
 {
@@ -32,6 +33,9 @@ namespace GraphicalCommandInterpreter
     public class CommandParser
     {
         private Dictionary<string, int> variables = new Dictionary<string, int>();
+        // Dictionary to store defined methods
+        private Dictionary<string, List<string>> methods = new Dictionary<string, List<string>>();
+        private bool executeMethodLines = true;
 
         /// <summary>
         /// Handles the specified graphical command and performs the corresponding action on the given form.
@@ -125,6 +129,25 @@ namespace GraphicalCommandInterpreter
                         executeLinesFlag = true;
                     }
 
+                    if (commandType == "method")
+                    {
+                        HandleMethodDefinition(parts);
+                    }
+                    else if (commandType == "endmethod")
+                    {
+                        // End method definition phase
+                        executeMethodLines = true;
+                    }
+                    else if (commandType == "call")
+                    {
+                        // Pass 'form' as a parameter to HandleMethodCall
+                        HandleMethodCall(form, parts);
+                    }
+
+                    else if (executeMethodLines)
+                    {
+                        // Existing code...
+                    }
 
                     // Check if it's a variable assignment
                     if (parts.Length >= 3 && parts[1] == "=")
@@ -142,6 +165,12 @@ namespace GraphicalCommandInterpreter
                                 case "if":
                                     break;
                                 case "endif":
+                                    break;
+                                case "method":
+                                    break;
+                                case "endmethod":
+                                    break;
+                                case "call":
                                     break;
                                 case "moveto":
                                     if (parts.Length == 3)
@@ -347,6 +376,39 @@ namespace GraphicalCommandInterpreter
                                     }
                                     break;
 
+                                case "drawshape":
+                                    if (parts.Length >= 2)
+                                    {
+                                        // Modified: Evaluate variables if used as parameters
+                                        int[] parameters = parts.Skip(1).Select(p => EvaluateParameter(p)).ToArray();
+
+                                        if (parameters.Length == 1)
+                                        {
+                                            form.DrawCircle(parameters[0]);
+                                        }
+                                        else if (parameters.Length == 2)
+                                        {
+                                            form.DrawRectangle(parameters[0], parameters[1]);
+                                        }
+                                        else if (parameters.Length == 3)
+                                        {
+                                            form.DrawTriangle(parameters[0], parameters[1], parameters[2]);
+                                        }
+                                        else if (parameters.Length > 3)
+                                        {
+                                            form.DrawPolygon(parameters);
+                                        }
+                                        else
+                                        {
+                                            throw new InvalidCommandException(line, "Invalid number of parameters for drawshape command.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new InvalidCommandException(line, "Invalid parameters for drawshape command.");
+                                    }
+                                    break;
+
                                 default:
                                     throw new InvalidCommandException(line, "Valid Commands include: moveto, drawto, pen, fill, clear, reset, circle, rectangle, and triangle. Try one");
                             }
@@ -390,9 +452,82 @@ namespace GraphicalCommandInterpreter
         }
 
 
+        // Handles method definition
+        private void HandleMethodDefinition(string[] parts)
+        {
+            if (parts.Length > 1)
+            {
+                string methodName = parts[1].ToLower();
+
+                // Check if method with the same name already exists
+                if (!methods.ContainsKey(methodName))
+                {
+                    // Store the lines inside the method
+                    methods[methodName] = new List<string>();
+                    executeMethodLines = false; // Do not execute lines inside the method definition
+                }
+                else
+                {
+                    throw new InvalidCommandException(string.Join(" ", parts), $"Method '{methodName}' already defined.");
+                }
+            }
+            else
+            {
+                throw new InvalidCommandException(string.Join(" ", parts), "Invalid method definition. Usage: method methodName");
+            }
+
+            // Add this line to set executeMethodLines back to true
+            executeMethodLines = false;
+        }
 
 
+        // Handles method call
+        private void HandleMethodCall(Form1 form, string[] parts)
+        {
+            if (parts.Length > 1)
+            {
+                string methodName = parts[1].ToLower();
 
+                // Check if the method exists
+                if (methods.ContainsKey(methodName))
+                {
+                    // Execute the lines inside the method
+                    foreach (string methodLine in methods[methodName])
+                    {
+                        // Pass 'form' as a parameter to the recursive call
+                        HandleCommand(form, methodLine);
+                        
+                    }
+                }
+                else
+                {
+                    throw new InvalidCommandException(string.Join(" ", parts), $"Method '{methodName}' not found.");
+                }
+            }
+            else
+            {
+                throw new InvalidCommandException(string.Join(" ", parts), "Invalid method call. Usage: call methodName");
+            }
+        }
+
+
+        private int EvaluateParameter(string parameter)
+{
+    if (int.TryParse(parameter, out int value))
+    {
+        // If it's a simple integer, return the value
+        return value;
+    }
+    else if (variables.TryGetValue(parameter, out int variableValue))
+    {
+        // If it's a variable, return its value
+        return variableValue;
+    }
+    else
+    {
+        throw new InvalidCommandException(parameter, "Invalid parameter in drawshape command.");
+    }
+}
 
 
 
